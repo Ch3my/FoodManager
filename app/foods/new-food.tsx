@@ -1,26 +1,18 @@
 import { Text, View, TextInput, IconButton } from '@/components/Themed';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Stack, router } from "expo-router";
-import { Alert, Pressable } from 'react-native';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { Stack } from "expo-router";
+import { Alert } from 'react-native';
 import { supabase } from '../../utils/supabase'
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 export default function NewFood() {
-    const colorScheme = useColorScheme();
     const [foodName, setFoodName] = useState<string>("")
     const [foodCodigo, setFoodCodigo] = useState<string>("")
-    const [diasDuracion, setDiasDuracion] = useState<number>(60)
+    const [cantidad, setCantidad] = useState<number>(1)
     const [showDateSavedPicker, setShowDateSavedPicker] = useState<boolean>(false)
+    const [showBestByPicker, setShowBestByPicker] = useState<boolean>(false)
     const [dateSaved, setDateSaved] = useState<Date>(new Date())
     const [bestBy, setBestBy] = useState<Date>(new Date())
-
-
-    useEffect(() => {
-        calculateBestByDate()
-    }, [dateSaved, diasDuracion]);
 
     const saveFood = async () => {
         if (foodName == "") {
@@ -34,7 +26,7 @@ export default function NewFood() {
                 name: foodName,
                 dateSaved,
                 bestBy,
-                bestDays: diasDuracion
+                cantidad
             }])
             .single();
         if (error) {
@@ -44,13 +36,6 @@ export default function NewFood() {
         Alert.alert("Exito!", "Guardado correctamente")
     }
 
-    // Function to calculate bestBy date
-    const calculateBestByDate = () => {
-        const newBestByDate = new Date(dateSaved); // Create a new Date object based on dateSaved
-        newBestByDate.setDate(newBestByDate.getDate() + diasDuracion); // Add diasDuracion days to the date
-        setBestBy(newBestByDate); // Update bestBy state with the new date value
-    };
-
     const onChangeDateSaved = (e: DateTimePickerEvent, date?: Date) => {
         setShowDateSavedPicker(!showDateSavedPicker)
         if (e.type == "set" && date) {
@@ -58,12 +43,19 @@ export default function NewFood() {
         }
     }
 
-    const onChangeDiasDuracion = (txt: string) => {
+    const onChangeBestBy = (e: DateTimePickerEvent, date?: Date) => {
+        setShowBestByPicker(!showBestByPicker)
+        if (e.type == "set" && date) {
+            setBestBy(date)
+        }
+    }
+
+    const onChangeCantidad = (txt: string) => {
         if (txt == "") {
-            setDiasDuracion(0)
+            setCantidad(0)
             return
         }
-        setDiasDuracion(parseInt(txt))
+        setCantidad(parseInt(txt))
     }
 
     return (
@@ -76,7 +68,11 @@ export default function NewFood() {
             <TextInput style={{ marginBottom: 10 }} onChangeText={setFoodCodigo} value={foodCodigo}
                 autoCapitalize="characters" />
             <Text>Nombre</Text>
-            <TextInput style={{ marginBottom: 10 }} onChangeText={setFoodName} value={foodName}></TextInput>
+            <TextInput style={{ marginBottom: 10 }} onChangeText={setFoodName} value={foodName} />
+            <Text>Cantidad</Text>
+            <TextInput style={{ marginBottom: 10 }}
+                value={cantidad.toString()} keyboardType='numeric'
+                onChangeText={onChangeCantidad} />
             <Text>Fecha Guardado</Text>
             <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
                 <TextInput editable={false} style={{ flex: 1 }} value={dateSaved.toLocaleDateString()} />
@@ -88,12 +84,17 @@ export default function NewFood() {
                         display="default" onChange={onChangeDateSaved} />
                 }
             </View>
-            <Text>Dias Duración</Text>
-            <TextInput style={{ marginBottom: 10 }}
-                value={diasDuracion.toString()} keyboardType='numeric'
-                onChangeText={onChangeDiasDuracion} />
             <Text>Fecha Vencimiento</Text>
-            <TextInput editable={false} value={bestBy.toLocaleDateString()} />
+            <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
+                <TextInput editable={false} style={{ flex: 1 }} value={bestBy.toLocaleDateString()} />
+                <IconButton iconName='search' onPress={() => {
+                    setShowBestByPicker(true)
+                }} />
+                {showBestByPicker &&
+                    <DateTimePicker mode="date" value={bestBy}
+                        display="default" onChange={onChangeBestBy} />
+                }
+            </View>
         </View>
     )
 }

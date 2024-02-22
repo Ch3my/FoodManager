@@ -61,7 +61,7 @@ export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
-  return <DefaultText style={[{ color, fontSize: 20 }, style]} {...otherProps} />;
+  return <DefaultText style={[{ color, fontSize: 18 }, style]} {...otherProps} />;
 }
 
 export function View(props: ViewProps) {
@@ -80,7 +80,7 @@ export function TextInput(props: TextInputProps) {
   return <DefaultTextInput style={[
     {
       backgroundColor, borderColor, borderWidth: 1,
-      fontSize: 20, color: textColor, padding: 10,
+      fontSize: 18, color: textColor, padding: 10,
       borderRadius: 5
     },
     style]} {...otherProps} />;

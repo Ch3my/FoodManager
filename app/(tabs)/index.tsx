@@ -12,7 +12,7 @@ import { MonoText } from "@/components/StyledText"
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { router, useFocusEffect } from "expo-router"
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
+type ItemProps = { food: Food };
 
 export default function TabOneScreen() {
   const [foodList, setFoodList] = useState<Food[] | null>([])
@@ -28,7 +28,8 @@ export default function TabOneScreen() {
   async function getFoodList() {
     setRefreshing(true)
 
-    const { data, error, status } = await supabase.from("foods").select();
+    const { data, error, status } = await supabase.from("foods").select()
+    .order('bestBy', { ascending: true })
 
     if (error) {
       console.error("Error fetching data:", error.message);
@@ -38,7 +39,6 @@ export default function TabOneScreen() {
     setRefreshing(false)
   }
 
-  type ItemProps = { food: Food };
 
   const deleteFood = async (id: number) => {
     // TODO. Preguntar por Confirmacion
@@ -112,6 +112,7 @@ export default function TabOneScreen() {
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', padding: 10, borderBottomColor: "white", borderBottomWidth: 1 }}>
             <MonoText style={{ color }}>{food.codSeguimiento}</MonoText>
             <Text style={{ color }}>{food.name}</Text>
+            <Text style={{ color }}>{food.cantidad}</Text>
             <Text style={{ color }}>{formatDate(food.bestBy)}</Text>
           </View>
         </Pressable>
@@ -130,6 +131,7 @@ export default function TabOneScreen() {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, borderBottomColor: "white", borderBottomWidth: 1 }}>
         <Text>Cod</Text>
         <Text>Nombre</Text>
+        <Text>Cant</Text>
         <Text>Fec Venc</Text>
       </View>
       <FlatList

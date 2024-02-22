@@ -3,6 +3,6 @@ export interface Food {
     name: string;
     dateSaved: Date;
     bestBy: Date;
-    bestDays: number;
+    cantidad: number;
     codSeguimiento: string
 }
