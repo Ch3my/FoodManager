@@ -1,9 +1,5 @@
-import { StyleSheet, Button, FlatList, Animated, Pressable, Alert } from 'react-native';
+import { StyleSheet, FlatList, Animated, Pressable, Alert } from 'react-native';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View, IconButton, useThemeColor } from '@/components/Themed';
 import { supabase } from '../../utils/supabase'
 import { Food } from '../../types/food'
@@ -12,6 +8,9 @@ import { MonoText } from "@/components/StyledText"
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { router, useFocusEffect } from "expo-router"
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import formatDate from '@/utils/format-date';
+import { printToFile } from '@/utils/print-to-file';
+
 type ItemProps = { food: Food };
 
 export default function TabOneScreen() {
@@ -29,7 +28,7 @@ export default function TabOneScreen() {
     setRefreshing(true)
 
     const { data, error, status } = await supabase.from("foods").select()
-    .order('bestBy', { ascending: true })
+      .order('bestBy', { ascending: true })
 
     if (error) {
       console.error("Error fetching data:", error.message);
@@ -42,7 +41,6 @@ export default function TabOneScreen() {
 
   const deleteFood = async (id: number) => {
     // TODO. Preguntar por Confirmacion
-    // console.log("DELETE")
     const { error } = await supabase
       .from('foods')
       .delete()
@@ -54,6 +52,69 @@ export default function TabOneScreen() {
     }
     getFoodList()
     Alert.alert("Exito!", "Eliminado correctamente")
+  }
+
+  const print = () => {
+    if (foodList == null) {
+      return
+    }
+    // Construir HTML
+    let html = `
+    <style>
+      table {
+        font-size: 14px; /* Setting font size for the entire page */
+      }
+      @page {
+        size: landscape;
+        margin: 10mm;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+      th, td {
+          border: 1px solid black;
+          padding: 4px;
+          text-align: left;
+      }
+    </style>`
+    html += `
+    <table>
+        <colgroup>
+        <col style="width: 10%;"> 
+        <col style="width: 26.66%;"> 
+        <col style="width: 9%;"> 
+        <col style="width: 11.66%;"> 
+        <col style="width: 11.66%;">
+        <col style="width: 29.66%;">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Fec. Guardado</th>
+                <th>Fecha Venc</th>
+                <th>Notas</th>
+            </tr>
+        </thead>
+        <tbody>`
+
+    for (let d of foodList) {
+      html += `
+      <tr>
+        <td>${d.codSeguimiento}</td>
+        <td>${d.name}</td>
+        <td>${d.cantidad}</td>
+        <td>${formatDate(d.dateSaved)}</td>
+        <td>${formatDate(d.bestBy)}</td>
+        <td></td>
+      </tr>`
+    }
+
+    html += `</tbody></table>`
+    // pasar a printToFile
+    printToFile(html)
   }
 
   const rightSwipe = (progress: any, dragX: any, id: number) => {
@@ -86,21 +147,11 @@ export default function TabOneScreen() {
     )
   }
 
-  function formatDate(date: Date): string {
-    if (typeof date == "string") {
-      return date
-    }
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Adding 1 because getMonth() returns zero-based index
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-  }
-
   const Item = ({ food }: ItemProps) => {
     const today = new Date();
     let color = useThemeColor({ light: "black", dark: "white" }, 'text');
-    
-    if(new Date(food.bestBy) <= today) {
+
+    if (new Date(food.bestBy) <= today) {
       color = "red"
     }
 
@@ -125,8 +176,8 @@ export default function TabOneScreen() {
       <View style={{ flexDirection: "row", gap: 10 }}>
         <IconButton iconName='plus'
           onPress={() => router.push("/foods/new-food")} />
-        <IconButton iconName='refresh'
-          onPress={() => getFoodList()} />
+        <IconButton iconName='refresh' onPress={() => getFoodList()} />
+        <IconButton iconName='print' onPress={() => print()} />
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, borderBottomColor: "white", borderBottomWidth: 1 }}>
         <Text>Cod</Text>

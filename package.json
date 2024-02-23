@@ -33,7 +33,9 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
     "react-native-gesture-handler": "~2.14.0",
-    "@react-native-community/datetimepicker": "7.6.1"
+    "@react-native-community/datetimepicker": "7.6.1",
+    "expo-print": "~12.8.1",
+    "expo-sharing": "~11.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

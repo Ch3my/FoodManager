@@ -24,6 +24,7 @@ type FontAwesomeIconName =
   | "plus"
   | "search"
   | "trash"
+  | "print"
   // Add more icon names as needed
   ;
 
