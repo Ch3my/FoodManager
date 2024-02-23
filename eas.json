@@ -1,0 +1,27 @@
+{
+  "cli": {
+    "version": ">= 7.2.0"
+  },
+  "build": {
+    "apk": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://vfpusjcsjkyxmkvgkisc.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANONKEY": ""
+      }
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {}
+  },
+  "submit": {
+    "production": {}
+  }
+}
