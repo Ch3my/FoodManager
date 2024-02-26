@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "prepare-build": "node build.js"
+    "build": "node build.js"
   },
   "jest": {
     "preset": "jest-expo"

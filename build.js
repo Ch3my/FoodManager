@@ -19,10 +19,12 @@ rl.on('line', (line) => {
   if (line.startsWith('EXPO_PUBLIC_SUPABASE_ANONKEY')) {
     const [key, value] = line.split('=');
     const trimmedKey = key.trim();
-    const trimmedValue = value.trim();
-    
-    if (easConfig.build && easConfig.build.apk && easConfig.build.apk.android && easConfig.build.apk.android.env) {
-      easConfig.build.apk.android.env.EXPO_PUBLIC_SUPABASE_ANONKEY = trimmedValue;
+    let trimmedValue = value.trim();
+    // Remove escaped quotes from the value
+    trimmedValue = trimmedValue.replace(/\"/g, '');
+
+    if (easConfig.build && easConfig.build.apk && easConfig.build.apk.env) {
+      easConfig.build.apk.env.EXPO_PUBLIC_SUPABASE_ANONKEY = trimmedValue;
     }
   }
 });
@@ -34,10 +36,10 @@ rl.on('close', () => {
 
     // After updating eas.json, execute eas build command
     exec('eas build -p android --profile apk', (error, stdout, stderr) => {
-    // exec('echo hi', (error, stdout, stderr) => {
+      // exec('echo hi', (error, stdout, stderr) => {
 
       if (error) {
-        console.error(`Error: ${error.message}`);
+        console.error('Command execution failed:', error);
         return;
       }
       if (stderr) {

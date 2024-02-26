@@ -1,6 +1,6 @@
-import { Text, View, TextInput, IconButton } from '@/components/Themed';
+import { Text, View, TextInput, IconButton, ScrollView } from '@/components/Themed';
 import { Stack } from "expo-router";
-import { Alert } from 'react-native';
+import { Alert  } from 'react-native';
 import { supabase } from '../../utils/supabase'
 import { useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -8,6 +8,7 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 export default function NewFood() {
     const [foodName, setFoodName] = useState<string>("")
     const [foodCodigo, setFoodCodigo] = useState<string>("")
+    const [foodNotes, setFoodNotes] = useState<string>("")
     const [cantidad, setCantidad] = useState<number>(1)
     const [showDateSavedPicker, setShowDateSavedPicker] = useState<boolean>(false)
     const [showBestByPicker, setShowBestByPicker] = useState<boolean>(false)
@@ -26,7 +27,8 @@ export default function NewFood() {
                 name: foodName,
                 dateSaved,
                 bestBy,
-                cantidad
+                cantidad,
+                notes: foodNotes
             }])
             .single();
         if (error) {
@@ -59,7 +61,7 @@ export default function NewFood() {
     }
 
     return (
-        <View style={{ padding: 10 }}>
+        <ScrollView style={{ padding: 10 }}>
             <Stack.Screen options={{ headerTitle: "Agregar Comida" }} />
             <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
                 <IconButton onPress={saveFood} iconName='save' />
@@ -95,6 +97,10 @@ export default function NewFood() {
                         display="default" onChange={onChangeBestBy} />
                 }
             </View>
-        </View>
+            <Text>Notas</Text>
+            <TextInput style={{ marginBottom: 10 }}
+                onChangeText={setFoodNotes} value={foodNotes}
+                numberOfLines={3} multiline />
+        </ScrollView>
     )
 }

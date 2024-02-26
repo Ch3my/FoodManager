@@ -8,8 +8,8 @@ import { supabase } from '../utils/supabase'
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { Session } from '@supabase/supabase-js';
-import { View } from 'react-native';
 import Auth from '@/components/Auth';
+import { View } from '@/components/Themed';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,10 +26,12 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null)
+  const [sessionFetched, setSessionFetched] = useState<boolean>(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      setSessionFetched(true)
     })
 
     supabase.auth.onAuthStateChange((_event, session) => {
@@ -37,6 +39,7 @@ export default function RootLayout() {
     })
   }, [])
 
+  // ==== FONTS STUFF ====
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
@@ -48,18 +51,29 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    // Se asegura de traer la sesion antes de ocultar la splashScreen
+    // asi evita mostrar el login mientras fetch la session
+    if (loaded && sessionFetched) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, sessionFetched]);
 
   if (!loaded) {
     return null;
   }
+  // ==== FONTS STUFF END ====
 
   return (
-    <View style={{flex:1}}>
-      {session && session.user ? <RootLayoutNav /> : <Auth />}
+    <View style={{ flex: 1 }}>
+      {session && session.user ? <RootLayoutNav /> :
+        <View style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Auth />
+        </View>
+      }
     </View>
   )
 }

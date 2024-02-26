@@ -5,4 +5,5 @@ export interface Food {
     bestBy: Date;
     cantidad: number;
     codSeguimiento: string
+    notes: string
 }

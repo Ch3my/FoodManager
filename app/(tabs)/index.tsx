@@ -126,13 +126,14 @@ export default function TabOneScreen() {
     return (
       <View style={{ flexDirection: 'row', width: 50 }}>
         <Animated.View style={{
-          justifyContent: 'center',
-          alignItems: 'center',
           transform: [{ translateX: translateDelete }],
-          backgroundColor: "red",
           width: 50
         }}>
-          <Pressable onPress={() => deleteFood(id)} >
+          <Pressable style={{
+            flex: 1, justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: "red"
+          }} onPress={() => deleteFood(id)} >
             {({ pressed }) => (
               <FontAwesome
                 size={25}
@@ -160,11 +161,19 @@ export default function TabOneScreen() {
         renderRightActions={(progress, dragX) => rightSwipe(progress, dragX, food.id)}
       >
         <Pressable onPress={() => { router.push(`/foods/edit/${food.id}`) }}>
-          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', padding: 10, borderBottomColor: "white", borderBottomWidth: 1 }}>
-            <MonoText style={{ color }}>{food.codSeguimiento}</MonoText>
-            <Text style={{ color }}>{food.name}</Text>
-            <Text style={{ color }}>{food.cantidad}</Text>
-            <Text style={{ color }}>{formatDate(food.bestBy)}</Text>
+          <View style={{
+            flexDirection: 'row', justifyContent: "space-between",
+            padding: 10, borderBottomColor: "white", borderBottomWidth: 1,
+            gap: 10
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <MonoText style={{ color }}>{food.codSeguimiento}</MonoText>
+              <Text style={{ color, flexShrink: 1 }} ellipsizeMode="tail" numberOfLines={1}>{food.name}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Text style={{ color }}>{food.cantidad}</Text>
+              <Text style={{ color }}>{formatDate(food.bestBy)}</Text>
+            </View>
           </View>
         </Pressable>
       </Swipeable>
@@ -189,6 +198,7 @@ export default function TabOneScreen() {
         onRefresh={getFoodList}
         refreshing={refreshing}
         data={foodList}
+        style={{ marginBottom: 80 }}
         renderItem={({ item }) => <Item food={item} />}
       />
     </View>

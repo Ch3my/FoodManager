@@ -6,6 +6,7 @@
 import {
   Text as DefaultText,
   View as DefaultView,
+  ScrollView as DefaultScrollView,
   TextInput as DefaultTextInput,
   Pressable,
   ViewStyle
@@ -42,6 +43,7 @@ type IconButtonArgs = {
 export type TextProps = ThemeProps & DefaultText['props'];
 export type TextInputProps = ThemeProps & DefaultTextInput['props'];
 export type ViewProps = ThemeProps & DefaultView['props'];
+export type ScrollViewProps = ThemeProps & DefaultScrollView['props'];
 export type IconButtonProps = ThemeProps & IconButtonArgs;
 
 export function useThemeColor(
@@ -70,6 +72,12 @@ export function View(props: ViewProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+export function ScrollView(props: ScrollViewProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+
+  return <DefaultScrollView style={[{ backgroundColor }, style]} {...otherProps} />;
 }
 
 export function TextInput(props: TextInputProps) {

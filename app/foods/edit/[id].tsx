@@ -1,4 +1,4 @@
-import { Text, View, TextInput, IconButton } from '@/components/Themed';
+import { Text, View, TextInput, IconButton, ScrollView } from '@/components/Themed';
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Alert } from 'react-native';
 import { supabase } from '../../../utils/supabase'
@@ -10,6 +10,7 @@ export default function EditFood() {
 
     const [foodName, setFoodName] = useState<string>("")
     const [foodCodigo, setFoodCodigo] = useState<string>("")
+    const [foodNotes, setFoodNotes] = useState<string>("")
     const [cantidad, setCantidad] = useState<number>(1)
     const [showDateSavedPicker, setShowDateSavedPicker] = useState<boolean>(false)
     const [dateSaved, setDateSaved] = useState<Date>(new Date())
@@ -34,6 +35,7 @@ export default function EditFood() {
         setDateSaved(new Date(data.dateSaved))
         setBestBy(new Date(data.bestBy))
         setCantidad(data.cantidad)
+        setFoodNotes(data.notes)
     }
 
     const saveFood = async () => {
@@ -48,7 +50,8 @@ export default function EditFood() {
                 name: foodName,
                 dateSaved,
                 bestBy,
-                cantidad
+                cantidad,
+                notes: foodNotes
             })
             .eq("id", id).single()
         if (error) {
@@ -81,7 +84,7 @@ export default function EditFood() {
     }
 
     return (
-        <View style={{ padding: 10 }}>
+        <ScrollView style={{ padding: 10 }}>
             <Stack.Screen options={{ headerTitle: "Editar Comida" }} />
             <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
                 <IconButton onPress={saveFood} iconName='save' />
@@ -90,7 +93,7 @@ export default function EditFood() {
             <TextInput style={{ marginBottom: 10 }} onChangeText={setFoodCodigo} value={foodCodigo}
                 autoCapitalize="characters" editable={false} />
             <Text>Nombre</Text>
-            <TextInput style={{ marginBottom: 10 }} onChangeText={setFoodName} value={foodName}/>
+            <TextInput style={{ marginBottom: 10 }} onChangeText={setFoodName} value={foodName} />
             <Text>Cantidad</Text>
             <TextInput style={{ marginBottom: 10 }}
                 value={cantidad.toString()} keyboardType='numeric'
@@ -117,6 +120,10 @@ export default function EditFood() {
                         display="default" onChange={onChangeBestBy} />
                 }
             </View>
-        </View>
+            <TextInput style={{ marginBottom: 10 }}
+                onChangeText={setFoodNotes} value={foodNotes}
+                numberOfLines={3} multiline />
+
+        </ScrollView>
     )
 }
