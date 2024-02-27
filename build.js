@@ -36,17 +36,6 @@ rl.on('close', () => {
 
     // After updating eas.json, execute eas build command
     exec('eas build -p android --profile apk', (error, stdout, stderr) => {
-      // exec('echo hi', (error, stdout, stderr) => {
-
-      if (error) {
-        console.error('Command execution failed:', error);
-        return;
-      }
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
 
       // Reset EXPO_PUBLIC_SUPABASE_ANONKEY property in eas.json to empty string
       if (easConfig.build && easConfig.build.apk && easConfig.build.apk.env) {
@@ -58,6 +47,18 @@ rl.on('close', () => {
         if (err) throw err;
         console.log('EXPO_PUBLIC_SUPABASE_ANONKEY property reset to empty string in eas.json.');
       });
+
+      console.log(`stdout: ${stdout}`);
+
+      if (error) {
+        console.error('Command execution failed:', error);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        return;
+      }
+
     });
   });
 });

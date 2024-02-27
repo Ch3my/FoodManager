@@ -101,15 +101,26 @@ export default function TabOneScreen() {
         <tbody>`
 
     for (let d of foodList) {
+      const today = new Date();
+      let vencido = false
+      if (new Date(d.bestBy) <= today) {
+        vencido = true
+      }
+
       html += `
       <tr>
         <td>${d.codSeguimiento}</td>
         <td>${d.name}</td>
         <td>${d.cantidad}</td>
         <td>${formatDate(d.dateSaved)}</td>
-        <td>${formatDate(d.bestBy)}</td>
-        <td></td>
-      </tr>`
+        <td>${formatDate(d.bestBy)}</td>`
+
+      html += `<td>`
+      if (vencido) {
+        html += "** VENCIDO ** "
+      }
+      html += `${d.notes}</td>`
+      html += `</tr>`
     }
 
     html += `</tbody></table>`
