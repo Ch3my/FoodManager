@@ -1,6 +1,6 @@
 import { Text, View, TextInput, IconButton, ScrollView } from '@/components/Themed';
 import { Stack } from "expo-router";
-import { Alert  } from 'react-native';
+import { Alert } from 'react-native';
 import { supabase } from '../../utils/supabase'
 import { useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -62,7 +62,7 @@ export default function NewFood() {
 
     return (
         <ScrollView style={{ padding: 10 }}>
-            <Stack.Screen options={{ headerTitle: "Agregar Comida" }} />
+            <Stack.Screen options={{ headerTitle: "Agregar Comida", headerTitleStyle: { color: "white" }, headerStyle: { backgroundColor: "black" }, headerTintColor: "white" }} />
             <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
                 <IconButton onPress={saveFood} iconName='save' />
             </View>

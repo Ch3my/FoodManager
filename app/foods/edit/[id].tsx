@@ -85,7 +85,7 @@ export default function EditFood() {
 
     return (
         <ScrollView style={{ padding: 10 }}>
-            <Stack.Screen options={{ headerTitle: "Editar Comida" }} />
+            <Stack.Screen options={{ headerTitle: "Editar Comida", headerTitleStyle: { color: "white" }, headerStyle: { backgroundColor: "black" }, headerTintColor: "white" }} />
             <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
                 <IconButton onPress={saveFood} iconName='save' />
             </View>

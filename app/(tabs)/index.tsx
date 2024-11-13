@@ -5,11 +5,14 @@ import { supabase } from '../../utils/supabase'
 import { Food } from '../../types/food'
 import { useCallback, useEffect, useState } from 'react';
 import { MonoText } from "@/components/StyledText"
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { router, useFocusEffect } from "expo-router"
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import formatDate from '@/utils/format-date';
 import { printToFile } from '@/utils/print-to-file';
+
+import Reanimated, { Extrapolation, interpolate, useAnimatedStyle } from "react-native-reanimated";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+
 
 type ItemProps = { food: Food };
 
@@ -129,17 +132,22 @@ export default function TabOneScreen() {
   }
 
   const rightSwipe = (progress: any, dragX: any, id: number) => {
-    const translateDelete = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [50, 1],
-      extrapolate: 'clamp',
-    });
+    const deleteStyle = useAnimatedStyle(() => {
+      const translateX = interpolate(
+          progress.value,
+          [0, 1],
+          [50, 1],
+          Extrapolation.CLAMP
+      );
+      return {
+          transform: [{ translateX }],
+          width: 50
+      };
+  });
+
     return (
       <View style={{ flexDirection: 'row', width: 50 }}>
-        <Animated.View style={{
-          transform: [{ translateX: translateDelete }],
-          width: 50
-        }}>
+        <Reanimated.View style={deleteStyle}>
           <Pressable style={{
             flex: 1, justifyContent: 'center',
             alignItems: 'center',
@@ -154,7 +162,7 @@ export default function TabOneScreen() {
               />
             )}
           </Pressable>
-        </Animated.View>
+        </Reanimated.View>
       </View>
     )
   }
@@ -168,8 +176,9 @@ export default function TabOneScreen() {
     }
 
     return (
-      <Swipeable
+      <ReanimatedSwipeable
         renderRightActions={(progress, dragX) => rightSwipe(progress, dragX, food.id)}
+        friction={1}
       >
         <Pressable onPress={() => { router.push(`/foods/edit/${food.id}`) }}>
           <View style={{
@@ -187,7 +196,7 @@ export default function TabOneScreen() {
             </View>
           </View>
         </Pressable>
-      </Swipeable>
+      </ReanimatedSwipeable>
     );
   }
 
