@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase'
+import { StatusBar } from 'expo-status-bar';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { Session } from '@supabase/supabase-js';
@@ -83,9 +84,10 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <StatusBar style={colorScheme == "dark" ? "light" : "dark"} />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', headerStyle:{backgroundColor: "black"} }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal', headerStyle: { backgroundColor: "black" } }} />
       </Stack>
     </ThemeProvider>
   );

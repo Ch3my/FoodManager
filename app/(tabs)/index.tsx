@@ -1,5 +1,4 @@
-import { StyleSheet, FlatList, Animated, Pressable, Alert } from 'react-native';
-
+import { StyleSheet, FlatList, Pressable, Alert } from 'react-native';
 import { Text, View, IconButton, useThemeColor } from '@/components/Themed';
 import { supabase } from '../../utils/supabase'
 import { Food } from '../../types/food'
@@ -12,9 +11,12 @@ import { printToFile } from '@/utils/print-to-file';
 
 import Reanimated, { Extrapolation, interpolate, useAnimatedStyle } from "react-native-reanimated";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import React from 'react';
 
-
-type ItemProps = { food: Food };
+type ItemProps = { 
+  food: Food; 
+  deleteFood: (id: number) => void;
+};
 
 export default function TabOneScreen() {
   const [foodList, setFoodList] = useState<Food[] | null>([])
@@ -27,37 +29,37 @@ export default function TabOneScreen() {
     // Para que no es necesario especificar nada en []
   );
 
-  async function getFoodList() {
-    setRefreshing(true)
+  const getFoodList = useCallback(async () => {
+    setRefreshing(true);
 
-    const { data, error, status } = await supabase.from("foods").select()
-      .order('bestBy', { ascending: true })
+    const { data, error } = await supabase.from("foods").select()
+      .order('bestBy', { ascending: true });
 
     if (error) {
       console.error("Error fetching data:", error.message);
-      return
+      setRefreshing(false);
+      return;
     }
-    setFoodList(data);
-    setRefreshing(false)
-  }
+    setFoodList(data || []);
+    setRefreshing(false);
+  }, []);
 
 
-  const deleteFood = async (id: number) => {
-    // TODO. Preguntar por Confirmacion
+  const deleteFood = useCallback(async (id: number) => {
     const { error } = await supabase
       .from('foods')
       .delete()
-      .eq('id', id)
+      .eq('id', id);
 
     if (error) {
-      Alert.alert("Error", error.message)
-      return
+      Alert.alert("Error", error.message);
+      return;
     }
-    getFoodList()
-    Alert.alert("Exito!", "Eliminado correctamente")
-  }
+    getFoodList();
+    Alert.alert("Success!", "Deleted successfully");
+  }, [getFoodList]);
 
-  const print = () => {
+  const print = useCallback(() => {
     if (foodList == null) {
       return
     }
@@ -129,7 +131,7 @@ export default function TabOneScreen() {
     html += `</tbody></table>`
     // pasar a printToFile
     printToFile(html)
-  }
+  }, [foodList]);
 
   const rightSwipe = (progress: any, dragX: any, id: number) => {
     const deleteStyle = useAnimatedStyle(() => {
@@ -167,17 +169,53 @@ export default function TabOneScreen() {
     )
   }
 
-  const Item = ({ food }: ItemProps) => {
+  const Item = React.memo(({ food, deleteFood }: ItemProps) => {
     const today = new Date();
     let color = useThemeColor({ light: "black", dark: "white" }, 'text');
-
+  
     if (new Date(food.bestBy) <= today) {
-      color = "red"
+      color = "red";
     }
-
+  
+    const rightSwipe = (progress: any, dragX: any) => {
+      const deleteStyle = useAnimatedStyle(() => {
+        const translateX = interpolate(
+          progress.value,
+          [0, 1],
+          [50, 1],
+          Extrapolation.CLAMP
+        );
+        return {
+          transform: [{ translateX }],
+          width: 50
+        };
+      });
+  
+      return (
+        <View style={{ flexDirection: 'row', width: 50 }}>
+          <Reanimated.View style={deleteStyle}>
+            <Pressable style={{
+              flex: 1, justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: "red"
+            }} onPress={() => deleteFood(food.id)} >
+              {({ pressed }) => (
+                <FontAwesome
+                  size={25}
+                  color={"white"}
+                  name={"trash"}
+                  style={{ opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          </Reanimated.View>
+        </View>
+      );
+    };
+  
     return (
       <ReanimatedSwipeable
-        renderRightActions={(progress, dragX) => rightSwipe(progress, dragX, food.id)}
+        renderRightActions={rightSwipe}
         friction={1}
       >
         <Pressable onPress={() => { router.push(`/foods/edit/${food.id}`) }}>
@@ -198,10 +236,14 @@ export default function TabOneScreen() {
         </Pressable>
       </ReanimatedSwipeable>
     );
-  }
+  });
+
+  const renderItem = useCallback(({ item }: { item: Food }) => (
+    <Item food={item} deleteFood={deleteFood} />
+  ), [deleteFood]);
 
   return (
-    <View style={{ padding: 10 }}>
+    <View style={{ padding: 10, flex: 1 }}>
       <View style={{ flexDirection: "row", gap: 10 }}>
         <IconButton iconName='plus'
           onPress={() => router.push("/foods/new-food")} />
@@ -218,8 +260,8 @@ export default function TabOneScreen() {
         onRefresh={getFoodList}
         refreshing={refreshing}
         data={foodList}
-        style={{ marginBottom: 80 }}
-        renderItem={({ item }) => <Item food={item} />}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
       />
     </View>
   );
